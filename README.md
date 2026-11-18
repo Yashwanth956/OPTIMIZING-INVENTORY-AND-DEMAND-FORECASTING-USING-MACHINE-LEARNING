@@ -1,4 +1,5 @@
-# OPTIMIZING-INVENTORY-AND-DEMAND-FORECASTING-USING-MACHINE-LEARNING
+# Inventory Optimization and Demand Forecasting
+
 A Streamlit dashboard for exploring sales records, comparing predictions with historical sales, and reviewing reorder flags. Upload a CSV or Excel workbook to start.
 
 ## Run locally
@@ -28,12 +29,37 @@ Open the local URL printed in the terminal and create a demo account.
 | `Sample - Superstore.xlsx` | Retail transactions with order dates |
 | `Inventory_data.xlsx` | Inventory records by store, brand, and vendor |
 
-## Interpreting the dashboard
+## How the project works
 
-The Random Forest demo uses day of year as its input. A nearly horizontal predicted-versus-actual plot means the model gives similar estimates across different actual sales values.
+### 1. Upload and inspect the data
 
-The reorder flag compares the sales value with the selected threshold. Actual purchasing decisions also require on-hand stock, supplier lead time, and the units being forecast.
+The Streamlit dashboard accepts CSV and Excel files. It previews the uploaded rows so users can check what each record represents. In the car sales demo, the first visible record has a purchase date of 25 February 2024 and a sales value of 620. The dashboard processes each dataset separately.
 
-## Project work
+### 2. Prepare dates and sales values
 
-The original application was developed by a teammate. My contributions include running the project locally, updating the dashboard background, testing the demo datasets, and investigating the ARIMA forecasting error.
+The app looks for a sales column and a date column, such as `purchase date` in the car dataset or `Order Date` in the Superstore workbook. It converts dates into a numeric feature called `DayOfYear`. For the example above, the Random Forest receives 56 as its input and 620 as the recorded sales value it is trying to predict. Other columns, such as income and mileage, appear in the preview but are excluded from this model's inputs.
+
+### 3. Train a forecasting model
+
+| Model | How the app uses it |
+| --- | --- |
+| Linear Regression | Fits a straight line between day of year and the recorded sales value. This provides a simple starting point for comparison. |
+| Random Forest | Trains 100 decision trees on day of year and averages their predictions. The car sales demo uses this option. |
+| ARIMA | Uses a sequence of sales observations to estimate future values. Testing on Superstore orders exposed an issue with repeated and out-of-order dates. In the corrected local version, sales are totaled by day, sorted by date, and missing calendar days are treated as zero sales. |
+| LSTM | Scales sales values and uses sequences of past observations to train a neural network that predicts the next value. |
+
+### 4. Read the results
+
+For Linear Regression and Random Forest, the app randomly assigns 80% of the records to training and 20% to testing. The **Predicted vs Actual Sales** chart plots recorded sales horizontally and predicted sales vertically. In the car sales demo, the predictions formed a nearly horizontal band. The model returned similar values for transactions with very different sales. This illustrates a limitation of using day of year as the only input.
+
+The random split measures performance on held-out records. To assess performance on future dates, train on earlier records and evaluate on a later period. The corrected local ARIMA workflow uses this chronological split.
+
+### 5. Explore future sales and reorder flags
+
+The forecast slider lets users select 1 to 30 days and download the resulting estimates as a CSV. Forecast values follow the meaning of the uploaded sales column. A forecast based on sales revenue is expressed in money. Estimating the number of items required calls for historical quantities sold.
+
+The inventory section applies a separate threshold rule. With the slider set to 159, a sales value of 120 receives the label **Reorder**, while a value of 200 receives **Sufficient**. This demonstrates how the interface flags records. A purchasing decision would also require current stock, outstanding orders, and supplier lead time.
+
+## My contributions
+
+I set up the Streamlit dashboard locally, added the warehouse background, and tested the app with car sales, retail orders, and inventory records. I reviewed the Random Forest predictions and identified a forecasting error when testing ARIMA on the Superstore data.
