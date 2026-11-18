@@ -59,7 +59,3 @@ The random split measures performance on held-out records. To assess performance
 The forecast slider lets users select 1 to 30 days and download the resulting estimates as a CSV. Forecast values follow the meaning of the uploaded sales column. A forecast based on sales revenue is expressed in money. Estimating the number of items required calls for historical quantities sold.
 
 The inventory section applies a separate threshold rule. With the slider set to 159, a sales value of 120 receives the label **Reorder**, while a value of 200 receives **Sufficient**. This demonstrates how the interface flags records. A purchasing decision would also require current stock, outstanding orders, and supplier lead time.
-
-## My contributions
-
-I set up the Streamlit dashboard locally, added the warehouse background, and tested the app with car sales, retail orders, and inventory records. I reviewed the Random Forest predictions and identified a forecasting error when testing ARIMA on the Superstore data.
